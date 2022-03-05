@@ -12,6 +12,8 @@ class Patch {
             state = false;
         }
 
+        virtual ~Patch() {}
+
         std::string getName() {
             return name;
         }
@@ -21,7 +23,7 @@ class Patch {
         }
 
         void setState(bool state) {
-          this->state = state;
+            this->state = state;
         }
 
         virtual void apply() = 0;
@@ -76,9 +78,9 @@ void usage() {
 
 bool linearScan(std::vector<Patch *> &patchList, std::string argument) {
     bool searchFlag = false;
-    for (int i = 0; i < patchList.size(); i++) {
-        if (argument == patchList[i]->getName()) {
-            patchList[i]->setState(true);
+    for (auto &patch : patchList) {
+        if (argument == patch->getName()) {
+            patch->setState(true);
             searchFlag = true;
             break;
         }
@@ -87,20 +89,20 @@ bool linearScan(std::vector<Patch *> &patchList, std::string argument) {
 }
 
 void applyPatches(std::vector<Patch *> &patchList, bool applyAll) {
-    for (int i = 0; i < patchList.size(); i++) {
+    for (auto &patch : patchList) {
         if (applyAll == true) {
-            patchList[i]->setState(true);
+            patch->setState(true);
         }
-        if (patchList[i]->getState() == true) {
-            std::cout << "Applying " << patchList[i]->getName() << "..." << std::endl;
-            patchList[i]->apply();
+        if (patch->getState() == true) {
+            std::cout << "Applying " << patch->getName() << "..." << std::endl;
+            patch->apply();
         }
     }
 }
 
 void freePatches(std::vector<Patch *> &patchList) {
-    for (int i = 0; i < patchList.size(); i++) {
-        delete patchList[i];
+    for (auto &patch : patchList) {
+        delete patch;
     }
 }
 
