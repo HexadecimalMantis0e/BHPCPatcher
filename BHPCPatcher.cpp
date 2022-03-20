@@ -68,6 +68,23 @@ class EnableDbugCharacter : public Patch {
         }
 };
 
+class RemoveSaveChecksum : public Patch {
+    public:
+        RemoveSaveChecksum(std::FILE *filePointer, std::string patchName) : Patch(filePointer, patchName) {}
+        void apply() {
+            /* Creator: Hexadecimal Mantis */
+            std::fseek(fp, 0x0012591F, SEEK_SET); // 0x0052591F
+            std::vector<unsigned char> patchBytes {
+                0x81, 0xF9, 0x00, 0x10, 0x00, 0x00, // cmp     ecx, 1000h
+                0x90,                               // nop
+                0x90,                               // nop
+                0x90,                               // nop
+                0x74, 0x0C                          // jz      short loc_525936
+            };
+            std::fwrite(&patchBytes[0], sizeof(std::vector<unsigned char>::value_type), patchBytes.size(), fp);
+        }
+};
+
 void usage() {
     std::cout << "Usage: BHPCPatcher -e executable [-p [patch] ...]" << std::endl;
     std::cout << "Arguments:" << std::endl;
@@ -121,7 +138,8 @@ int main(int argc, char *argv[]) {
 
         std::vector<Patch *> patches {
             new RemoveBloom(f0, "RemoveBloom"),
-            new EnableDbugCharacter(f0, "EnableDbugCharacter")
+            new EnableDbugCharacter(f0, "EnableDbugCharacter"),
+            new RemoveSaveChecksum(f0, "RemoveSaveChecksum")
         };
 
         if (argc > 3) {
