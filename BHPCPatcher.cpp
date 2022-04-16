@@ -85,6 +85,28 @@ class RemoveSaveChecksum : public Patch {
         }
 };
 
+class RemovePakChecksum : public Patch {
+    public:
+        RemovePakChecksum(std::FILE *filePointer, std::string patchName) : Patch(filePointer, patchName) {}
+        void apply() {
+            /* Creator: Hexadecimal Mantis */
+            std::fseek(fp, 0x0016B8D6, SEEK_SET); // 0x0056B8D6
+            std::vector<unsigned char> patchBytes {
+                0x8B, 0x5E, 0x08, // mov     ebx, [esi+8]
+                0x8B, 0xD7,       // mov     edx, edi
+                0x8B, 0xCE,       // mov     ecx, esi
+                0x89, 0x6E, 0x0C, // mov     [esi+0Ch], ebp
+                0x90,             // nop
+                0x90,             // nop
+                0x90,             // nop
+                0x90,             // nop
+                0x90,             // nop
+                0x39, 0xD3        // cmp     ebx, edx
+            };
+            std::fwrite(&patchBytes[0], sizeof(std::vector<unsigned char>::value_type), patchBytes.size(), fp);
+        }
+};
+
 void usage() {
     std::cout << "Usage: BHPCPatcher -e executable [-p [patch] ...]" << std::endl;
     std::cout << "Arguments:" << std::endl;
@@ -139,7 +161,8 @@ int main(int argc, char *argv[]) {
         std::vector<Patch *> patches {
             new RemoveBloom(f0, "RemoveBloom"),
             new EnableDbugCharacter(f0, "EnableDbugCharacter"),
-            new RemoveSaveChecksum(f0, "RemoveSaveChecksum")
+            new RemoveSaveChecksum(f0, "RemoveSaveChecksum"),
+            new RemovePakChecksum(f0, "RemovePakChecksum")
         };
 
         if (argc > 3) {
