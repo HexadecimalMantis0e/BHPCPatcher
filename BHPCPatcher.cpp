@@ -75,11 +75,8 @@ class RemoveSaveChecksum : public Patch {
             /* Creator: Hexadecimal Mantis */
             std::fseek(fp, 0x0012591F, SEEK_SET); // 0x0052591F
             std::vector<unsigned char> patchBytes {
-                0x81, 0xF9, 0x00, 0x10, 0x00, 0x00, // cmp     ecx, 1000h
-                0x90,                               // nop
-                0x90,                               // nop
-                0x90,                               // nop
-                0x74, 0x0C                          // jz      short loc_525936
+                0x83, 0xF9, 0x00, // cmp     ecx, 0
+                0x75, 0x12        // jnz     short loc_525936
             };
             std::fwrite(&patchBytes[0], sizeof(std::vector<unsigned char>::value_type), patchBytes.size(), fp);
         }
