@@ -4,7 +4,7 @@ EXE=BHPCPatcher
 
 all: $(EXE)
 
-$(EXE): BHPCPatcher.cpp
+$(EXE): BHPCPatcher.cpp Patch.cpp Util.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^ -static
 
 clean:
